@@ -16,7 +16,7 @@
     "url": "https://github.com/michaelpaulukonis/drugpackagesbot/issues"
   },
   "engines": {
-    "node": "0.12.0"
+    "node": "0.12.2"
   },
   "dependencies": {
     "pg": "4.x",
@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "grunt": "~0.4.1",
-    "grunt-docco2": "~0.1.5",
     "grunt-contrib-jshint": "~0.6.0",
     "grunt-contrib-watch": "~0.4.0"
   }
