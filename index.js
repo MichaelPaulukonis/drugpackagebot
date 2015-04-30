@@ -4,35 +4,45 @@ var Twit = require('twit');
 var T = new Twit(config);
 var sequencer = new (require('./sequencer.js'))();
 var pg = require('pg');
+var _ = require('underscore');
+_.mixin(require('underscore.deferred'));
 
 // ### Utility Functions
-
 var logger = function(msg) {
-  // console.log('logging?: ' + config.log);
   if (config.log) console.log(msg);
 };
 
 var tweeter = function(texts) {
 
-  var sentence = sequencer.next();
-  console.log(sentence);
+  _.when(
+    sequencer.next()
+  ) .then(function() {
 
-  return;
+    // console.log(arguments);
 
-  if (newSentence.length === 0 || newSentence.length > 140) {
-    tweeter();
-  } else {
-    if (config.tweet_on) {
-      T.post('statuses/update', { status: newSentence }, function(err, reply) {
-	if (err) {
-	  console.log('error:', err);
-	}
-	else {
-          // nothing on success
-	}
-      });
+    var sentence =_.flatten(arguments);
+    if (sentence[0]) sentence = sentence[0];
+
+    console.log(sentence);
+
+    return; // temp to avoid tweeter
+
+    if (sentence.length === 0 || sentence.length > 140) {
+      tweeter();
+    } else {
+      if (config.tweet_on) {
+        T.post('statuses/update', { status: sentence }, function(err, reply) {
+	  if (err) {
+	    console.log('error:', err);
+	  }
+	  else {
+            // nothing on success unless we wanna get crazy with logging replies
+	  }
+        });
+      }
     }
-  }
+
+  });
 
 };
 

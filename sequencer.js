@@ -1,6 +1,9 @@
 // pg-code based on https://github.com/Gangles/every-game-bot/blob/master/everygamebot.js
 var pg = require('pg');
 var config = require('./config.js');
+var _ = require('underscore');
+_.mixin(require('underscore.deferred'));
+
 
 var DB_CREATE = 'CREATE TABLE IF NOT EXISTS sequence '
       + '(currentIndex integer NOT NULL)';
@@ -35,16 +38,20 @@ var sequencer = function() {
 
   // console.log('length: ' + list.length + ' ' + list[0]);
 
-  // TODO: need to have this be a node.js module
   // TODO: need to split the lines that are longer than 140 chars
   // TODO: the index-storage needs to be external
-  // but that can wait a bit
 
   this.next = function() {
-    return list[index++];
+    var dfd = new _.Deferred();
+    // return list[index++];
+    var sentence = list[index++];
+    // console.log(sentence);
+    dfd.resolve(sentence);
+    return dfd.promise();
   };
 
-  initDB();
+  // tempt turn-off
+  // initDB();
 
 };
 
