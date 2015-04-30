@@ -15,7 +15,6 @@ var sequencer = function() {
 
   var initDB = function() {
     console.log('initializing DB');
-    console.log(client);
     try {
       // connect to postgres db
       client.connect(function(err) {
