@@ -58,4 +58,17 @@ var rewriter = function() {
 
 
 
-rewriter();
+// rewriter();
+
+var checker = function() {
+
+  var lines = require('./packages.txt');
+
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    if (line.length > 140) {
+      console.log(i + ' : ' + line);
+    }
+  }
+
+}();
