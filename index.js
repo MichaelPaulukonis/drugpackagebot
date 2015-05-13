@@ -18,14 +18,10 @@ var tweeter = function(texts) {
     sequencer.next()
   ) .then(function() {
 
-    // console.log(arguments);
-
     var sentence =_.flatten(arguments);
     if (sentence[0]) sentence = sentence[0];
 
-    console.log(sentence);
-
-    return; // temp to avoid tweeter
+    logger(sentence);
 
     if (sentence.length === 0 || sentence.length > 140) {
       tweeter();
