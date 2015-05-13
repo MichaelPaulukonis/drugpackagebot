@@ -46,17 +46,27 @@ var tweeter = function(texts) {
 
 };
 
-
-// Tweets ever n minutes
-// set config.seconds to 60 for a complete minute
-setInterval(function () {
-  try {
-    tweeter();
+_.when(
+  sequencer.initDB()
+).then(function(status) {
+  if (status.toLowerCase().indexOf('error') > -1) {
+    console.log(status);
+    process.exit();
   }
-  catch (e) {
-    console.log(e);
-  }
-}, 1000 * config.minutes * config.seconds);
 
-// Tweets once on initialization.
-tweeter();
+  // only start up if no init errors
+
+  // Tweets ever n minutes
+  // set config.seconds to 60 for a complete minute
+  setInterval(function () {
+    try {
+      tweeter();
+    }
+    catch (e) {
+      console.log(e);
+    }
+  }, 1000 * config.minutes * config.seconds);
+
+  // Tweets once on initialization.
+  tweeter();
+});

@@ -21,56 +21,61 @@ var sequencer = function() {
   var index = 0;
   var client = new pg.Client(config.database_url);
 
-  var initDB = function() {
+  this.initDB = function() {
+
+    var dfd = new _.Deferred();
+
     console.log('initializing DB');
     try {
       query(DB_CREATE, function(err, rows, result) {
-        if (err) return console.log('DB init error:', err);
-        return console.log('Database initialized');
+        var status;
+        if (err) {
+          console.log('DB init error: ', err);
+          status = 'DB init error: ' + err.toString();
+        } else {
+          status = 'Database initialized';
+          console.log(status);
+        }
+        dfd.resolve(status);
       });
-      // // connect to postgres db
-      // client.connect(function(err) {
-      //   // connected, make sure table exists
-      //   if (err) return console.log('DB init error:', err);
-      //   client.query(DB_CREATE, function(err) {
-      //     // table exists, start tweeting
-      //     if (err) return console.log('DB init error (create):', err);
-      //     console.log("Database initialized.");
-      //     // waitToBegin();
-      //   });
-      // });
     } catch (e) {
-      console.log("DB init error:", e.toString());
+      console.log('DB init error: ', e.toString());
+      dfd.resolve('DB init error: ' + e.toString());
     }
-  };
-
-
- this.next = function() {
-    var dfd = new _.Deferred();
-
-   query(DB_QUERY, function(err, rows, data) {
-     if (err) return console.log('QUERY ERROR:', err);
-     if (rows.length == 0) {
-       query(DB_INIT_RECORD, function(err, rows, data) {
-         // UGH WE R NESTING AGAIN
-       });
-     } else {
-       var currentIndex = rows[0].currentindex + 1;
-       // console.log('currentIndex: ', currentIndex);
-       var sentence = list[currentIndex];
-       dfd.resolve(sentence);
-       query(DB_UPDATE, function(err) {
-         if (err) return console.log(err);
-       });
-     }
-
-   });
 
     return dfd.promise();
 
   };
 
-  initDB();
+
+  this.next = function() {
+    var dfd = new _.Deferred();
+
+    query(DB_QUERY, function(err, rows, data) {
+      if (err) {
+        dfd.resolve('QUERY ERROR: ' + err);
+      } else {
+
+        if (rows.length == 0) {
+          query(DB_INIT_RECORD, function(err, rows, data) {
+            // UGH WE R NESTING AGAIN
+            console.log('DB initialized with first record');
+          });
+        } else {
+          var currentIndex = rows[0].currentindex + 1;
+          console.log('currentIndex: ', currentIndex);
+          var sentence = list[currentIndex];
+          query(DB_UPDATE, function(err) {
+            if (err) dfd.resolve('DB_UPDATE error: ' + err);
+            dfd.resolve(sentence);
+          });
+        }
+      }
+    });
+
+    return dfd.promise();
+
+  };
 
 };
 
